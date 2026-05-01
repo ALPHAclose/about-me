@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEURAL_ARCHITECT | OS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        orbitron: ['Orbitron', 'sans-serif'],
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'sys-primary': '#FFF3E8',
+                        'sys-secondary': 'rgba(255, 230, 200, 0.75)',
+                        'sys-muted': 'rgba(255, 230, 200, 0.45)',
+                        'sys-orange': '#ff7a1a',
+                        'sys-orange-dark': '#ff5a00',
+                        'sys-bg-dark': '#0a0502',
+                        'sys-bg-light': '#1a0b05',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --glass-bg-hover: rgba(255, 255, 255, 0.08);
+            --glass-border-hover: rgba(255, 255, 255, 0.25);
+            --glow-text: 0 0 12px rgba(255, 120, 40, 0.25);
+            --glow-box: 0 0 30px rgba(255, 120, 40, 0.15);
+            --transition-speed: 250ms;
+        }
+
+        body {
+            background-color: var(--sys-bg-dark);
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(255, 122, 26, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 80% 20%, rgba(255, 90, 0, 0.12) 0%, transparent 35%),
+                linear-gradient(180deg, #1a0b05 0%, #0a0502 100%);
+            background-attachment: fixed;
+            color: theme('colors.sys-secondary');
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            margin: 0;
+        }
+        
+        /* Grain overlay */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.04;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Utility Classes */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            transition: all var(--transition-speed) ease;
+        }
+        .glass:hover {
+            background: var(--glass-bg-hover);
+            border: 1px solid var(--glass-border-hover);
+        }
+        
+        .heading-glow {
+            text-shadow: var(--glow-text);
+        }
+        .box-glow {
+            box-shadow: var(--glow-box);
+        }
+
+        /* Typography */
+        .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 0.02em;
+        }
+        
+        /* Buttons */
+        .btn-glass {
+            padding: 10px 20px;
+            border-radius: 8px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: theme('colors.sys-primary');
+            transition: all var(--transition-speed) ease;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 13px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+        .btn-glass:hover {
+            background: var(--glass-bg-hover);
+            border: 1px solid rgba(255, 120, 40, 0.4);
+            box-shadow: 0 0 15px rgba(255, 120, 40, 0.2);
+            color: theme('colors.sys-primary');
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #ff7a1a, #ff5a00);
+            color: theme('colors.sys-primary');
+            padding: 12px 22px;
+            border-radius: 8px;
+            border: none;
+            transition: all var(--transition-speed) ease;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 13px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #ff8c3a, #ff6a1a);
+            box-shadow: 0 0 20px rgba(255, 120, 40, 0.4);
+            transform: translateY(-1px);
+        }
+
+        /* Specific section styles */
+        #boot {
+            position: fixed;
+            inset: 0;
+            background: #0a0502;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease;
+        }
+        .boot-log {
+            font-family: monospace;
+            color: theme('colors.sys-muted');
+            font-size: 12px;
+            margin-top: 20px;
+            height: 20px;
+            text-align: center;
+        }
+        .progress-bar-container {
+            width: 200px;
+            height: 2px;
+            background: rgba(255,255,255,0.1);
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .progress-bar {
+            position: absolute;
+            top: 0; left: 0; height: 100%;
+            background: #ff7a1a;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        /* Hide elements initially for boot sequence */
+        #app-content {
+            opacity: 0;
+            transition: opacity 0.8s ease;
+            display: none;
+        }
+        
+        .nav-link {
+            font-size: 13px;
+            color: theme('colors.sys-secondary');
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            transition: color var(--transition-speed);
+            position: relative;
+        }
+        .nav-link:hover {
+            color: theme('colors.sys-primary');
+        }
+        .nav-link.active {
+            color: theme('colors.sys-primary');
+        }
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: rgba(255, 120, 40, 0.5);
+        }
+
+        .role-text {
+            display: inline-block;
+            color: theme('colors.sys-orange');
+            text-shadow: 0 0 10px rgba(255, 120, 40, 0.3);
+            min-width: 250px;
+        }
+
+        /* Project Cards */
+        .project-card {
+            border-radius: 16px;
+            padding: 16px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+        }
+        .project-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--glow-box);
+            border-color: rgba(255, 120, 40, 0.3);
+        }
+        .project-img-container {
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            aspect-ratio: 16/9;
+            margin-bottom: 16px;
+        }
+        .project-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(100%) opacity(0.8);
+            transition: all 0.5s ease;
+        }
+        .project-card:hover .project-img {
+            filter: grayscale(0%) opacity(1);
+            transform: scale(1.05);
+        }
+        
+        /* Hidden Sections */
+        .page-section {
+            display: block;
+            animation: fadeIn 0.3s ease forwards;
+        }
+        .page-section.hidden {
+            display: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Filters */
+        .filter-btn {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 12px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: theme('colors.sys-muted');
+            transition: all var(--transition-speed);
+        }
+        .filter-btn:hover, .filter-btn.active {
+            color: theme('colors.sys-primary');
+            text-shadow: var(--glow-text);
+        }
+        
+        /* Cursor tracker glow */
+        #cursor-glow {
+            position: fixed;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255,120,40,0.05) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: -1;
+            transform: translate(-50%, -50%);
+            transition: opacity 0.3s ease;
+            opacity: 0;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-sys-orange selection:text-white">
+
+    <!-- Cursor Glow -->
+    <div id="cursor-glow"></div>
+
+    <!-- BOOT SCREEN -->
+    <section id="boot">
+        <h1 class="font-orbitron text-2xl text-sys-primary heading-glow mb-4 tracking-widest">NEURAL_ARCHITECT</h1>
+        <div class="font-orbitron text-sys-secondary text-sm tracking-[0.2em]">INITIALIZING OS...</div>
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="boot-progress"></div>
+        </div>
+        <div class="boot-log" id="boot-log">Starting up sequence...</div>
+    </section>
+
+    <!-- MAIN APP CONTENT -->
+    <div id="app-content">
+        
+        <!-- NAVBAR -->
+        <header class="fixed top-0 w-full border-b border-white/10 glass z-50 rounded-none bg-sys-bg-dark/60">
+            <div class="flex justify-between items-center w-full px-8 h-20 max-w-[1440px] mx-auto">
+                <div class="text-lg font-orbitron font-bold tracking-[0.1em] text-sys-primary heading-glow cursor-pointer" onclick="navigate('home')">
+                    NEURAL_ARCHITECT
+                </div>
+                <nav class="hidden md:flex gap-12">
+                    <a class="nav-link active" href="#" onclick="navigate('home')">Home</a>
+                    <a class="nav-link" href="#projects" onclick="navigate('home')">Mission Archive</a>
+                    <!-- Phase 2/3 links
+                    <a class="nav-link" href="#about">Identity</a>
+                    <a class="nav-link" href="#contact">Terminal</a>
+                    -->
+                </nav>
+                <button class="btn-glass">
+                    CONNECT
+                </button>
+            </div>
+        </header>
+
+        <main class="max-w-[1440px] mx-auto px-8 pt-32 pb-24">
+            
+            <!-- HOME VIEW -->
+            <div id="view-home" class="page-section">
+                <!-- HERO SECTION -->
+                <section id="hero" class="grid grid-cols-12 gap-8 items-center min-h-[70vh] mb-32">
+                    <div class="col-span-12 lg:col-span-8 space-y-8">
+                        <div class="inline-flex items-center gap-2 px-4 py-2 glass rounded-full">
+                            <span class="w-2 h-2 rounded-full bg-sys-orange animate-pulse box-glow"></span>
+                            <span class="font-orbitron text-[11px] text-sys-primary uppercase tracking-[0.1em]">System Active</span>
+                        </div>
+                        
+                        <h1 class="text-sys-primary leading-tight font-orbitron heading-glow uppercase">
+                            I build futuristic <br>
+                            digital systems blending <br>
+                            design, code, and <span id="role-text" class="role-text">AI</span>.
+                        </h1>
+                        
+                        <p class="text-sys-secondary text-lg max-w-xl font-light leading-relaxed">
+                            Pioneering the intersection of biological intent and digital execution. Building high-performance interfaces for the next generation of web experience.
+                        </p>
+                        
+                        <div class="flex gap-4 pt-4">
+                            <button class="btn-primary">
+                                INITIATE SEQUENCE
+                            </button>
+                            <button class="btn-glass border-transparent hover:border-transparent hover:bg-white/5">
+                                VIEW_DATA
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Personal Data Panel -->
+                    <div class="col-span-12 lg:col-span-4">
+                        <div class="glass p-8 space-y-8 rounded-2xl relative overflow-hidden group">
+                            <!-- Decorative bg element -->
+                            <div class="absolute -right-10 -top-10 w-40 h-40 bg-sys-orange/10 rounded-full blur-3xl group-hover:bg-sys-orange/20 transition-all duration-500"></div>
+                            
+                            <h3 class="font-orbitron text-xs text-sys-muted uppercase tracking-[0.1em] border-b border-white/10 pb-4">System Profile</h3>
+                            
+                            <div class="space-y-6 relative z-10">
+                                <div class="flex justify-between items-end border-b border-white/5 pb-2">
+                                    <span class="font-orbitron text-xs text-sys-muted tracking-widest">STATUS</span>
+                                    <span class="font-orbitron text-sm text-sys-primary heading-glow">OPEN FOR PROJECTS</span>
+                                </div>
+                                <div class="flex justify-between items-end border-b border-white/5 pb-2">
+                                    <span class="font-orbitron text-xs text-sys-muted tracking-widest">FOCUS</span>
+                                    <span class="font-orbitron text-sm text-sys-primary">FRONTEND / AI UI</span>
+                                </div>
+                                <div class="flex justify-between items-end border-b border-white/5 pb-2">
+                                    <span class="font-orbitron text-xs text-sys-muted tracking-widest">MISSIONS</span>
+                                    <span class="font-orbitron text-xl text-sys-primary" id="counter-projects">0+</span>
+                                </div>
+                                <div class="flex justify-between items-end border-b border-white/5 pb-2">
+                                    <span class="font-orbitron text-xs text-sys-muted tracking-widest">EXP</span>
+                                    <span class="font-orbitron text-xl text-sys-primary" id="counter-exp">0 YRS</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- PROJECTS SECTION -->
+                <section id="projects" class="space-y-12">
+                    <div class="flex flex-col md:flex-row md:items-end justify-between border-b border-white/10 pb-6 gap-6">
+                        <div>
+                            <h2 class="font-orbitron text-sys-primary heading-glow uppercase tracking-wide">Mission Archive</h2>
+                            <p class="text-sys-muted mt-2 text-sm">Select a project to view case study parameters.</p>
+                        </div>
+                        <div class="flex gap-6">
+                            <button class="filter-btn active">ALL</button>
+                            <button class="filter-btn">UI</button>
+                            <button class="filter-btn">DEV</button>
+                            <button class="filter-btn">AI</button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <!-- Project 1 -->
+                        <div class="glass project-card group" onclick="openCaseStudy('alpha')">
+                            <div class="project-img-container">
+                                <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop" alt="Project Alpha" class="project-img">
+                                <div class="absolute inset-0 bg-gradient-to-t from-sys-bg-dark/80 to-transparent"></div>
+                                <div class="absolute top-4 right-4 glass px-3 py-1 rounded-full border-white/10 backdrop-blur-md">
+                                    <span class="font-orbitron text-[10px] text-sys-primary uppercase tracking-widest">AI / UI</span>
+                                </div>
+                            </div>
+                            <div class="space-y-2 flex-grow">
+                                <h3 class="font-orbitron text-sm text-sys-primary uppercase tracking-wider">Project Alpha</h3>
+                                <p class="text-xs text-sys-secondary line-clamp-2 leading-relaxed">Autonomous neural interface for cross-chain data synchronization and real-time visualization.</p>
+                            </div>
+                            <div class="flex justify-between items-center pt-6 mt-auto border-t border-white/5">
+                                <span class="font-orbitron text-[10px] text-sys-muted uppercase tracking-widest">2024 / Protocol</span>
+                                <span class="material-symbols-outlined text-sys-orange text-sm opacity-0 group-hover:opacity-100 transition-opacity transform group-hover:translate-x-1">arrow_forward</span>
+                            </div>
+                        </div>
+
+                        <!-- Project 2 -->
+                        <div class="glass project-card group" onclick="openCaseStudy('biosync')">
+                            <div class="project-img-container">
+                                <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop" alt="Bio-Sync" class="project-img">
+                                <div class="absolute inset-0 bg-gradient-to-t from-sys-bg-dark/80 to-transparent"></div>
+                                <div class="absolute top-4 right-4 glass px-3 py-1 rounded-full border-white/10 backdrop-blur-md">
+                                    <span class="font-orbitron text-[10px] text-sys-primary uppercase tracking-widest">DEV</span>
+                                </div>
+                            </div>
+                            <div class="space-y-2 flex-grow">
+                                <h3 class="font-orbitron text-sm text-sys-primary uppercase tracking-wider">Bio-Sync Interface</h3>
+                                <p class="text-xs text-sys-secondary line-clamp-2 leading-relaxed">Biometric authentication system utilizing advanced pupil-tracking and ocular pattern recognition.</p>
+                            </div>
+                            <div class="flex justify-between items-center pt-6 mt-auto border-t border-white/5">
+                                <span class="font-orbitron text-[10px] text-sys-muted uppercase tracking-widest">2023 / R&D</span>
+                                <span class="material-symbols-outlined text-sys-orange text-sm opacity-0 group-hover:opacity-100 transition-opacity transform group-hover:translate-x-1">arrow_forward</span>
+                            </div>
+                        </div>
+
+                        <!-- Project 3 -->
+                        <div class="glass project-card group" onclick="openCaseStudy('quantum')">
+                            <div class="project-img-container">
+                                <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop" alt="Quantum" class="project-img">
+                                <div class="absolute inset-0 bg-gradient-to-t from-sys-bg-dark/80 to-transparent"></div>
+                                <div class="absolute top-4 right-4 glass px-3 py-1 rounded-full border-white/10 backdrop-blur-md">
+                                    <span class="font-orbitron text-[10px] text-sys-primary uppercase tracking-widest">UI</span>
+                                </div>
+                            </div>
+                            <div class="space-y-2 flex-grow">
+                                <h3 class="font-orbitron text-sm text-sys-primary uppercase tracking-wider">Quantum Dashboard</h3>
+                                <p class="text-xs text-sys-secondary line-clamp-2 leading-relaxed">High-performance analytics engine designed for sub-millisecond market monitoring and execution.</p>
+                            </div>
+                            <div class="flex justify-between items-center pt-6 mt-auto border-t border-white/5">
+                                <span class="font-orbitron text-[10px] text-sys-muted uppercase tracking-widest">2024 / Commercial</span>
+                                <span class="material-symbols-outlined text-sys-orange text-sm opacity-0 group-hover:opacity-100 transition-opacity transform group-hover:translate-x-1">arrow_forward</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- CASE STUDY VIEW (Hidden by default) -->
+            <div id="view-case-study" class="page-section hidden">
+                <button class="btn-glass mb-8 flex items-center gap-2 w-fit group" onclick="navigate('home')">
+                    <span class="material-symbols-outlined text-sm group-hover:-translate-x-1 transition-transform">arrow_back</span>
+                    RETURN_TO_HUB
+                </button>
+                
+                <div class="glass p-8 md:p-12 rounded-2xl space-y-12">
+                    <div class="space-y-4 border-b border-white/10 pb-8">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 glass rounded-full border-white/10 mb-2">
+                            <span class="font-orbitron text-[10px] text-sys-primary uppercase tracking-widest" id="cs-category">AI / UI</span>
+                        </div>
+                        <h2 class="font-orbitron text-3xl md:text-5xl text-sys-primary heading-glow uppercase" id="cs-title">Project Alpha</h2>
+                        <p class="text-sys-secondary text-lg max-w-2xl" id="cs-desc">Autonomous neural interface for cross-chain data synchronization and real-time visualization.</p>
+                    </div>
+
+                    <div class="project-img-container aspect-video w-full">
+                        <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop" id="cs-img" alt="Project Cover" class="w-full h-full object-cover">
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                        <div class="col-span-1 md:col-span-2 space-y-12">
+                            <div class="space-y-4">
+                                <h3 class="font-orbitron text-sys-primary uppercase tracking-wider text-lg flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-sys-orange">warning</span>
+                                    The Problem
+                                </h3>
+                                <p class="text-sys-secondary leading-relaxed">Current blockchain visualization tools lack the real-time processing capabilities required for high-frequency algorithmic traders. The interface needed to handle thousands of data points per second without degrading the browser's render pipeline.</p>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <h3 class="font-orbitron text-sys-primary uppercase tracking-wider text-lg flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-sys-orange">architecture</span>
+                                    Design Decisions & Process
+                                </h3>
+                                <p class="text-sys-secondary leading-relaxed">We adopted a "Dark Neural" aesthetic, prioritizing contrast and legibility. Key decisions included utilizing WebGL for data rendering off the main thread, and implementing a strict color hierarchy where orange (#ff7a1a) acts as the primary interactive cue against a deep obsidian background.</p>
+                            </div>
+
+                            <div class="space-y-4">
+                                <h3 class="font-orbitron text-sys-primary uppercase tracking-wider text-lg flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-sys-orange">flag</span>
+                                    Final Result & Learnings
+                                </h3>
+                                <p class="text-sys-secondary leading-relaxed">The final application achieved a sustained 60fps render cycle with 10k+ active nodes. The biggest learning was managing memory allocation in WebGL to prevent garbage collection spikes during critical trading windows.</p>
+                            </div>
+                        </div>
+
+                        <div class="col-span-1 space-y-8">
+                            <div class="glass p-6 rounded-xl space-y-6">
+                                <div>
+                                    <h4 class="font-orbitron text-xs text-sys-muted uppercase tracking-widest mb-2 border-b border-white/5 pb-2">Tech Stack</h4>
+                                    <div class="flex flex-wrap gap-2 mt-4">
+                                        <span class="px-3 py-1 bg-white/5 rounded text-xs text-sys-primary font-orbitron tracking-wider border border-white/10">React</span>
+                                        <span class="px-3 py-1 bg-white/5 rounded text-xs text-sys-primary font-orbitron tracking-wider border border-white/10">WebGL</span>
+                                        <span class="px-3 py-1 bg-white/5 rounded text-xs text-sys-primary font-orbitron tracking-wider border border-white/10">GLSL</span>
+                                        <span class="px-3 py-1 bg-white/5 rounded text-xs text-sys-primary font-orbitron tracking-wider border border-white/10">Tailwind</span>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <h4 class="font-orbitron text-xs text-sys-muted uppercase tracking-widest mb-2 border-b border-white/5 pb-2">Role</h4>
+                                    <p class="text-sm text-sys-secondary mt-2">Lead Developer & UI Designer</p>
+                                </div>
+
+                                <div>
+                                    <h4 class="font-orbitron text-xs text-sys-muted uppercase tracking-widest mb-2 border-b border-white/5 pb-2">Year</h4>
+                                    <p class="text-sm text-sys-secondary mt-2">2024</p>
+                                </div>
+
+                                <button class="btn-primary w-full mt-4 flex justify-center items-center gap-2">
+                                    LAUNCH_PROJECT
+                                    <span class="material-symbols-outlined text-sm">open_in_new</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+        
+        <!-- Minimal Footer -->
+        <footer class="w-full border-t border-white/5 bg-sys-bg-dark/80 backdrop-blur-md py-8 mt-20">
+            <div class="max-w-[1440px] mx-auto px-8 flex justify-between items-center text-[10px] font-orbitron tracking-widest uppercase text-sys-muted">
+                <div>v1.0.0 // STATUS: ONLINE</div>
+                <div>© 2024 NEURAL_ARCHITECT</div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- LOGIC SCRIPTS -->
+
+    <!-- Boot Sequence Logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const bootScreen = document.getElementById('boot');
+            const appContent = document.getElementById('app-content');
+            const bootProgress = document.getElementById('boot-progress');
+            const bootLog = document.getElementById('boot-log');
+
+            const logs = [
+                "Loading identity modules...",
+                "Syncing neural pathways...",
+                "Compiling interface assets...",
+                "Establishing secure connection...",
+                "Interface ready."
+            ];
+
+            let progress = 0;
+            let logIndex = 0;
+
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress > 100) progress = 100;
+                
+                bootProgress.style.width = `${progress}%`;
+
+                if (progress > (logIndex + 1) * 20 && logIndex < logs.length) {
+                    bootLog.innerText = logs[logIndex];
+                    logIndex++;
+                }
+
+                if (progress === 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        bootLog.innerText = "SYSTEM ONLINE";
+                        bootLog.style.color = "#ff7a1a";
+                        bootLog.style.textShadow = "0 0 10px rgba(255,120,40,0.5)";
+                        
+                        setTimeout(() => {
+                            bootScreen.style.opacity = '0';
+                            setTimeout(() => {
+                                bootScreen.style.display = 'none';
+                                appContent.style.display = 'block';
+                                // trigger reflow
+                                void appContent.offsetWidth;
+                                appContent.style.opacity = '1';
+                                initAppAnimations();
+                            }, 500);
+                        }, 400);
+                    }, 200);
+                }
+            }, 100);
+        });
+    </script>
+
+    <!-- App Interactions Logic -->
+    <script>
+        // Hero Role Rotation
+        const roles = ["AI", "Interaction", "Systems"];
+        let roleIdx = 0;
+        const roleEl = document.getElementById('role-text');
+        
+        setInterval(() => {
+            roleEl.style.opacity = 0;
+            setTimeout(() => {
+                roleIdx = (roleIdx + 1) % roles.length;
+                roleEl.innerText = roles[roleIdx];
+                roleEl.style.opacity = 1;
+            }, 300); // Wait for fade out
+        }, 3000);
+        roleEl.style.transition = "opacity 0.3s ease";
+
+        // Number Counters Animation
+        function animateCounter(id, end, duration, suffix = "") {
+            const obj = document.getElementById(id);
+            if(!obj) return;
+            let start = 0;
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                obj.innerHTML = Math.floor(progress * end) + suffix;
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        function initAppAnimations() {
+            animateCounter("counter-projects", 12, 1500, "+");
+            animateCounter("counter-exp", 2, 1500, "+ YRS");
+        }
+
+        // Navigation Logic (SPA feel)
+        function navigate(viewId) {
+            const views = ['view-home', 'view-case-study'];
+            views.forEach(v => {
+                document.getElementById(v).classList.add('hidden');
+            });
+            
+            if(viewId === 'home') {
+                document.getElementById('view-home').classList.remove('hidden');
+                window.scrollTo({top: 0, behavior: 'smooth'});
+            }
+        }
+
+        // Project Data Mock
+        const projectData = {
+            'alpha': {
+                title: 'Project Alpha',
+                category: 'AI / UI',
+                desc: 'Autonomous neural interface for cross-chain data synchronization and real-time visualization.',
+                img: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop'
+            },
+            'biosync': {
+                title: 'Bio-Sync Interface',
+                category: 'DEV',
+                desc: 'Biometric authentication system utilizing advanced pupil-tracking and ocular pattern recognition.',
+                img: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop'
+            },
+            'quantum': {
+                title: 'Quantum Dashboard',
+                category: 'UI',
+                desc: 'High-performance analytics engine designed for sub-millisecond market monitoring and execution.',
+                img: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop'
+            }
+        };
+
+        function openCaseStudy(projectId) {
+            const data = projectData[projectId];
+            if(data) {
+                document.getElementById('cs-title').innerText = data.title;
+                document.getElementById('cs-category').innerText = data.category;
+                document.getElementById('cs-desc').innerText = data.desc;
+                document.getElementById('cs-img').src = data.img;
+                
+                document.getElementById('view-home').classList.add('hidden');
+                document.getElementById('view-case-study').classList.remove('hidden');
+                window.scrollTo({top: 0, behavior: 'smooth'});
+            }
+        }
+
+        // Cursor tracking glow (subtle)
+        const glow = document.getElementById('cursor-glow');
+        let cursorX = window.innerWidth / 2;
+        let cursorY = window.innerHeight / 2;
+        
+        document.addEventListener('mousemove', (e) => {
+            cursorX = e.clientX;
+            cursorY = e.clientY;
+        });
+
+        // Use requestAnimationFrame for smooth cursor following without lag
+        function updateCursorGlow() {
+            glow.style.left = cursorX + 'px';
+            glow.style.top = cursorY + 'px';
+            requestAnimationFrame(updateCursorGlow);
+        }
+        updateCursorGlow();
+
+        // Show glow only when mouse moves
+        document.body.addEventListener('mouseenter', () => glow.style.opacity = '1');
+        document.body.addEventListener('mouseleave', () => glow.style.opacity = '0');
+        // Initial setup for glow opacity after boot
+        setTimeout(() => {
+            if(document.getElementById('app-content').style.opacity === '1') {
+                glow.style.opacity = '1';
+            }
+        }, 2000);
+
+    </script>
+</body>
+</html>
