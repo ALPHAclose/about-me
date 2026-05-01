@@ -171,29 +171,55 @@
             display: none;
         }
         
-        .nav-link {
+        .nav-link-unified {
             font-size: 13px;
-            color: theme('colors.sys-secondary');
-            font-family: 'Orbitron', sans-serif;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            transition: color var(--transition-speed);
+            color: rgba(255, 243, 232, 0.6);
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            transition: all 0.3s ease;
             position: relative;
+            padding: 4px 0;
+            text-transform: uppercase;
         }
-        .nav-link:hover {
-            color: theme('colors.sys-primary');
+        .nav-link-unified:hover, .nav-link-unified.active {
+            color: #FFF3E8;
+            text-shadow: 0 0 10px rgba(255, 120, 40, 0.4);
         }
-        .nav-link.active {
-            color: theme('colors.sys-primary');
-        }
-        .nav-link.active::after {
+        .nav-link-unified::after {
             content: '';
             position: absolute;
-            bottom: -4px;
-            left: 0;
-            width: 100%;
+            bottom: -2px;
+            left: 50%;
+            width: 0;
             height: 1px;
-            background: rgba(255, 120, 40, 0.5);
+            background: linear-gradient(90deg, transparent, rgba(255,120,40,0.8), transparent);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+            opacity: 0;
+            box-shadow: 0 0 8px rgba(255,120,40,0.6);
+        }
+        .nav-link-unified:hover::after, .nav-link-unified.active::after {
+            width: 100%;
+            opacity: 1;
+        }
+
+        .nav-btn-unified {
+            padding: 8px 16px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #FFF3E8;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 12px;
+            letter-spacing: 0.1em;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+        .nav-btn-unified:hover {
+            background: linear-gradient(135deg, rgba(255,122,26,0.1), rgba(255,90,0,0.1));
+            border-color: rgba(255, 122, 26, 0.4);
+            box-shadow: 0 0 15px rgba(255, 122, 26, 0.2);
         }
 
         .role-text {
@@ -299,24 +325,34 @@
     <div id="app-content">
         
         <!-- NAVBAR -->
-        <header class="fixed top-0 w-full border-b border-white/10 glass z-50 rounded-none bg-sys-bg-dark/60">
-            <div class="flex justify-between items-center w-full px-8 h-20 max-w-[1440px] mx-auto">
-                <div class="text-lg font-orbitron font-bold tracking-[0.1em] text-sys-primary heading-glow cursor-pointer" onclick="navigate('home')">
-                    NEURAL_ARCHITECT
+        <div class="fixed top-6 left-1/2 -translate-x-1/2 w-[95%] max-w-[1150px] z-50">
+            <header class="glass rounded-2xl h-[70px] flex items-center justify-between px-8 bg-white/[0.03]">
+                <!-- Left: Logo -->
+                <div class="w-1/3 flex justify-start">
+                    <div class="text-[14px] font-orbitron font-medium tracking-[0.15em] text-sys-primary cursor-pointer hover:text-white transition-colors" onclick="navigate('home')">
+                        NEURAL_ARCHITECT
+                    </div>
                 </div>
-                <nav class="hidden md:flex gap-12">
-                    <a class="nav-link active" href="#" onclick="navigate('home')">Home</a>
-                    <a class="nav-link" href="#projects" onclick="navigate('home')">Mission Archive</a>
-                    <!-- Phase 2/3 links
-                    <a class="nav-link" href="#about">Identity</a>
-                    <a class="nav-link" href="#contact">Terminal</a>
-                    -->
-                </nav>
-                <button class="btn-glass">
-                    CONNECT
-                </button>
-            </div>
-        </header>
+
+                <!-- Center: Links -->
+                <div class="w-1/3 flex justify-center">
+                    <nav class="hidden md:flex items-center gap-[30px]">
+                        <a class="nav-link-unified active" href="#about" onclick="navigate('home')">About</a>
+                        <a class="nav-link-unified" href="#projects" onclick="navigate('home')">Projects</a>
+                        <a class="nav-link-unified" href="#skills" onclick="navigate('home')">Skills</a>
+                        <a class="nav-link-unified" href="#lab" onclick="navigate('home')">Lab</a>
+                        <a class="nav-link-unified" href="#contact" onclick="navigate('home')">Contact</a>
+                    </nav>
+                </div>
+
+                <!-- Right: Action Button -->
+                <div class="w-1/3 flex justify-end">
+                    <button class="nav-btn-unified cursor-pointer">
+                        CONNECT
+                    </button>
+                </div>
+            </header>
+        </div>
 
         <main class="max-w-[1440px] mx-auto px-8 pt-32 pb-24">
             
